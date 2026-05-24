@@ -2,8 +2,8 @@
 #include <net/ethernet.h>
 #include <sys/socket.h>
 
-void sendPackets(){
+void Layer2(){
 
-    unsigned char buffer[65536];
+    // unsigned char buffer[65536];
 
 }
