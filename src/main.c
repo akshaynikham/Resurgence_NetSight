@@ -2,15 +2,19 @@
 #include <net/ethernet.h>
 #include <stdio.h>
 #include <arpa/inet.h>
-#include <netpacket/packet.h>
 #include <net/if.h>
+#include <linux/if_packet.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 int main(){
 
-    int sock = socket( AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    int sock_fd = socket( AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
-    if(sock >=0){
-        printf("Success! %d\n", sock);
+    if(sock_fd >=0){
+        printf("Success! %d\n", sock_fd);
     }else{
         perror("Socket creation failed");
         return 1;
@@ -26,7 +30,20 @@ int main(){
         printf("Interface %s has index %u\n", name, index);
     }
 
-    close(sock);
+    struct sockaddr_ll sll;
+
+    sll.sll_family = AF_PACKET;
+    sll.sll_protocol = htons(ETH_P_ALL);
+    sll.sll_ifindex = index;
+
+    if(bind(sock_fd, (struct sockaddr *)&sll, sizeof(sll)) < 0){
+        perror("failed to bind");
+    }else{
+        printf("bind succeeded\n");
+    }
+
+
+    close(sock_fd);
 
     
     return 0;

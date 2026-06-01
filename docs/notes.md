@@ -73,11 +73,17 @@ struct in_addr {
 
 struct sockaddr_ll {
     unsigned short sll_family;   // 2 Bytes: Address family (Always set to AF_PACKET)
+
     unsigned short sll_protocol; // 2 Bytes: Physical Protocol (EtherType, e.g., ETH_P_IP or ETH_P_ARP)
+
     int            sll_ifindex;  // 4 Bytes: Network Interface Index (The system ID for eth0, wlan0, etc.)
+
     unsigned short sll_hatype;   // 2 Bytes: Hardware Address Type (e.g., ARPHRD_ETHER for standard Ethernet)
+
     unsigned char  sll_pkttype;  // 1 Byte:  Packet Type (e.g., PACKET_HOST for us, PACKET_BROADCAST)
+
     unsigned char  sll_halen;    // 1 Byte:  Length of the physical MAC address (Always 6 bytes for Ethernet)
+    
     unsigned char  sll_addr[8];  // 8 Bytes: The actual Physical MAC Address (Only 6 bytes used, 2 bytes padding)
 };
 
