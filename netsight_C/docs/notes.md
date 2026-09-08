@@ -4,6 +4,683 @@ Goal: Build a packet snipping tool >> Integrate with main project >> Build Stron
 
 ---
 
+
+# Resurgence NetSight (RNS)
+
+## Academy 1 – Computer Architecture Foundations
+
+### Version 0.1 (Engineering Notes)
+
+---
+
+# RNS Vision
+
+**Mission**
+
+Build Resurgence NetSight (RNS) from first principles to understand how a network packet travels from hardware to software.
+
+**Goal**
+
+Do not memorize technologies.
+
+Instead:
+
+* Understand why every component exists.
+* Discover engineering problems before learning implementations.
+* Build intuition before writing code.
+
+---
+
+# RNS Learning Framework
+
+Every topic follows the same process.
+
+1. Engineering Problem
+2. System Visualization
+3. Design Our Own Solution
+4. Compare with Real Systems
+5. Hands-on Implementation
+6. Under-the-Hood Explanation
+7. Architecture Checkpoint
+8. Engineering Law
+9. Integrate into RNS
+
+---
+
+# Engineering Laws
+
+## Law 1
+
+Large data is stored in contiguous memory because sequential access is simple for both hardware and software.
+
+---
+
+## Law 2
+
+Contiguous memory allows navigation using simple arithmetic instead of searching.
+
+---
+
+## Law 3
+
+An address identifies a location.
+
+The data stored at that location is a separate concept.
+
+---
+
+## Law 4
+
+Every abstraction in software is ultimately implemented by simpler hardware mechanisms.
+
+Examples:
+
+Pointer → Address
+
+Address → Electrical Signals
+
+Electrical Signals → Memory Cell
+
+Memory Cells → Buffer
+
+Buffer → Packet
+
+---
+
+## Law 5
+
+The CPU defines the address space it can generate.
+
+RAM defines how much physical memory exists.
+
+These are related but not identical.
+
+---
+
+## Law 6
+
+A processor exists because stored information has no meaning until some component interprets and acts upon it.
+
+RAM stores.
+
+CPU interprets.
+
+---
+
+## Law 7
+
+Whenever two components communicate, they must share an agreed format.
+
+Examples:
+
+* CPU Instruction Format
+* Ethernet Frame
+* IP Header
+* TCP Header
+* USB
+* PCIe
+
+---
+
+## Law 8
+
+The closer data is to the CPU, the faster it can be processed.
+
+Examples:
+
+Registers
+
+↓
+
+Cache
+
+↓
+
+RAM
+
+↓
+
+SSD
+
+---
+
+## Law 9
+
+Sequential execution means repeatedly fetching the next instruction.
+
+Only control-flow instructions change that sequence.
+
+---
+
+# Mental Models
+
+## Warehouse Model
+
+Memory is like a warehouse.
+
+Every box stores exactly one byte.
+
+Every box has a unique address.
+
+Boxes are arranged consecutively.
+
+Example:
+
+Address 1000
+
+↓
+
+Byte
+
+Address 1001
+
+↓
+
+Next Byte
+
+---
+
+## Why Arrays Exist
+
+An array is simply contiguous memory.
+
+Example:
+
+unsigned char buffer[65536];
+
+Meaning:
+
+Reserve 65,536 consecutive bytes.
+
+---
+
+## Why Buffers Exist
+
+DMA
+
+NIC
+
+Kernel
+
+recvfrom()
+
+All rely on contiguous memory.
+
+---
+
+# Memory
+
+Memory stores bytes.
+
+Each address represents one byte.
+
+Addresses identify locations.
+
+Data identifies contents.
+
+Never confuse the two.
+
+---
+
+# DMA
+
+Problem:
+
+CPU copying every packet wastes CPU time.
+
+Solution:
+
+DMA copies directly into RAM.
+
+CPU performs other work.
+
+Engineering Insight:
+
+Move data as few times as possible.
+
+---
+
+# Ring Buffer
+
+Purpose:
+
+Continuous packet transfer without constantly allocating memory.
+
+Ownership changes.
+
+Kernel
+
+↓
+
+NIC
+
+↓
+
+Linux
+
+↓
+
+Kernel
+
+Buffers move between owners.
+
+---
+
+# CPU
+
+The CPU is not simply a calculator.
+
+It consists of multiple cooperating components.
+
+---
+
+## CPU Responsibilities
+
+Read instructions.
+
+Store temporary values.
+
+Coordinate execution.
+
+Perform arithmetic.
+
+Store results.
+
+Move to next instruction.
+
+---
+
+# Registers
+
+Problem:
+
+RAM is too slow.
+
+Solution:
+
+Provide tiny, extremely fast storage inside the CPU.
+
+Registers store temporary data.
+
+Examples:
+
+R1
+
+R2
+
+---
+
+# Program Pointer
+
+Problem:
+
+How does the CPU know where the next instruction lives?
+
+Solution:
+
+Program Pointer.
+
+Official name:
+
+Program Counter (PC).
+
+Stores:
+
+The address of the next instruction.
+
+It stores an address.
+
+Not the instruction itself.
+
+---
+
+# Instruction Register
+
+Problem:
+
+The CPU fetches an instruction.
+
+Where should it keep it while decoding?
+
+Solution:
+
+Instruction Register.
+
+Stores:
+
+Current instruction only.
+
+---
+
+# Control Unit
+
+Responsibilities:
+
+Read instruction.
+
+Decode instruction.
+
+Generate control signals.
+
+Coordinate hardware.
+
+Does NOT perform arithmetic.
+
+Acts like an orchestra conductor.
+
+---
+
+# ALU
+
+Arithmetic Logic Unit.
+
+Responsibilities:
+
+Addition
+
+Subtraction
+
+Logic
+
+Comparison
+
+The ALU performs computation.
+
+The Control Unit decides when it should operate.
+
+---
+
+# Instruction Format
+
+An instruction is structured.
+
+Example:
+
+LOAD R1,10
+
+Conceptually:
+
+Opcode
+
+Destination Register
+
+Value
+
+This is similar to a network protocol.
+
+Both use agreed formats.
+
+---
+
+# CPU Execution Cycle
+
+1.
+
+Program Pointer contains address.
+
+↓
+
+2.
+
+CPU asks RAM for instruction.
+
+↓
+
+3.
+
+RAM returns instruction.
+
+↓
+
+4.
+
+Instruction stored in Instruction Register.
+
+↓
+
+5.
+
+Control Unit decodes instruction.
+
+↓
+
+6.
+
+Control Unit coordinates execution.
+
+↓
+
+7.
+
+Registers/ALU perform required work.
+
+↓
+
+8.
+
+Program Pointer updated.
+
+↓
+
+Repeat.
+
+---
+
+# Why Program Pointer Updates After Execute
+
+If updated before execution:
+
+Instruction skipped.
+
+If updated too early:
+
+Exceptions become difficult.
+
+General Rule:
+
+After execution completes, determine the next instruction.
+
+Usually:
+
+Current + 1
+
+Sometimes:
+
+Jump Target
+
+---
+
+# Binary and Addressing
+
+Electrical wires carry:
+
+ON
+
+OFF
+
+Equivalent to:
+
+1
+
+0
+
+With N address wires:
+
+2^N possible combinations.
+
+Examples:
+
+8 wires
+
+↓
+
+256 addresses
+
+32 wires
+
+↓
+
+2^32 addresses
+
+64 wires
+
+↓
+
+2^64 addresses (conceptually)
+
+---
+
+# Relationship Between Components
+
+Program
+
+↓
+
+Compiler
+
+↓
+
+Executable
+
+↓
+
+SSD
+
+↓
+
+Linux Loader
+
+↓
+
+RAM
+
+↓
+
+CPU
+
+↓
+
+Program Pointer
+
+↓
+
+Fetch
+
+↓
+
+Decode
+
+↓
+
+Execute
+
+↓
+
+NetSight
+
+---
+
+# Networking Connection
+
+
+socket()
+
+↓
+
+bind()
+
+↓
+
+recvfrom()
+
+↓
+
+Packet Capture
+
+↓
+
+Ethernet Parsing
+
+↓
+
+IP Parsing
+
+↓
+
+TCP Parsing
+
+↓
+
+Digital Forensics
+
+---
+
+# RNS Philosophy
+
+Never ask:
+
+"What does this API do?"
+
+Instead ask:
+
+Why does it exist?
+
+What problem does it solve?
+
+What would break if it didn't exist?
+
+---
+
+# Phase 1 Summary
+
+
+* Registers
+* Program Pointer
+* Instruction Register
+* Control Unit responsibilities
+* Instruction format
+* Sequential execution
+* Instruction lifecycle
+* CPU and RAM interaction
+* DMA motivation
+* Contiguous memory
+* Addressing
+* Binary as electrical states
+
+
+---
+
+# Current Roadmap
+
+Phase 1 ✓ Invent a CPU
+
+Next:
+
+* Real CPU Architecture
+* Clock Signal
+* Datapath
+* Control Signals
+* Machine Code
+* Assembly
+* Memory Hierarchy
+* Virtual Memory
+* Linux Process Loading
+* System Calls
+* Sockets
+* Network Stack
+* Packet Capture
+* Ethernet
+* IPv4
+* TCP
+* Digital Forensics
+* Resurgence NetSight v1.0
+
+---
+
+
+
+
+
 **Socket()**: A kernel-managed communication endpoint/interface exposed to user space.
 
 The function is defined in the <sys/socket.h> header:
@@ -153,3 +830,23 @@ The Server vs. Client Distinction
 
         The Collision Check: The kernel scans its master table to see if another active process has already claimed our requested local port.
         The Stamp: If the port is free, it commits the local IP and port to the socket's internal ledger.
+
+
+**recvfrom():**
+
+Receiving Data and Knowing Who Sent It.
+
+Intuition: 
+    Think of it like this: imagine you're a postal worker at a sorting office. A letter arrives in your inbox. recv() just hands you the letter. recvfrom() hands you the letter and tells you the return address on the envelope.
+
+The signature:
+
+    ssize_t recvfrom(
+    int sockfd,          // Your mailbox (the socket you're listening on)
+    void *buf,           // The table where you place the letter (your buffer)
+    size_t len,          // How big is that table? (max bytes to receive)
+    int flags,           // Special instructions (usually 0)
+    struct sockaddr *src_addr,   // WHO sent it? (filled in by the OS)
+    socklen_t *addrlen           // How big is that address structure?
+);
+

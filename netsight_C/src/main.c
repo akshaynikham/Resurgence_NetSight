@@ -41,8 +41,9 @@ int main(){
     }else{
         printf("bind succeeded\n");
     }
-
-
+    
+    
+    
     close(sock_fd);
 
     

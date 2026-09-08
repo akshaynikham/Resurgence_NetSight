@@ -1,0 +1,3 @@
+/home/root123/Desktop/Resurgence_NetSight/netsight_cpp/build/CMakeFiles/netsight.dir
+/home/root123/Desktop/Resurgence_NetSight/netsight_cpp/build/CMakeFiles/edit_cache.dir
+/home/root123/Desktop/Resurgence_NetSight/netsight_cpp/build/CMakeFiles/rebuild_cache.dir
